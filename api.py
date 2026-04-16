@@ -3,7 +3,6 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from tensorflow.keras.models import load_model
 from sklearn.preprocessing import LabelEncoder
-import pandas as pd
 import numpy as np
 import joblib
 import tempfile
@@ -17,9 +16,11 @@ CORS(app)
 print("Loading model...")
 model = load_model("safety_alert_model.h5")
 scaler = joblib.load("scaler.pkl")
-df = pd.read_csv("features.csv")
+
+# Hardcoded class labels (same order as training)
+CLASSES = ["angry_confrontation", "gunshot", "safe", "screaming_distress", "siren", "vehicle_horn"]
 encoder = LabelEncoder()
-encoder.fit(df["label"].values)
+encoder.fit(CLASSES)
 print(f"Model loaded! Classes: {list(encoder.classes_)}")
 
 ALERT_MESSAGES = {
@@ -49,12 +50,10 @@ def predict():
 
     audio_file = request.files["audio"]
 
-    # Save incoming audio (could be webm, ogg, etc.)
     with tempfile.NamedTemporaryFile(suffix=".webm", delete=False) as f:
         input_path = f.name
         audio_file.save(input_path)
 
-    # Convert to wav using ffmpeg
     wav_path = input_path.replace(".webm", ".wav")
     try:
         subprocess.run([
@@ -102,6 +101,5 @@ def health():
     return jsonify({"status": "ok"})
 
 if __name__ == "__main__":
-    import os
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
