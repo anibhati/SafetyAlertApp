@@ -4,6 +4,5 @@ __pycache__/
 features.csv
 HumanScreamingDataSet/
 Emotions/
-*.h5
-*.pkl
 accuracy_plot.png
+.DS_Store
