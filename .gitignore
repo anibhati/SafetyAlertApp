@@ -1,0 +1,9 @@
+venv/
+__pycache__/
+*.pyc
+features.csv
+HumanScreamingDataSet/
+Emotions/
+*.h5
+*.pkl
+accuracy_plot.png
